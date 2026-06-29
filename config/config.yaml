@@ -1,0 +1,14 @@
+project:
+  output_dir: outputs
+  assets_dir: assets
+
+ollama:
+  model: qwen3
+
+whisper:
+  model: base
+
+video:
+  fps: 30
+  width: 1920
+  height: 1080
