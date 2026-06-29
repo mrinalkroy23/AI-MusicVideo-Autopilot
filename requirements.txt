@@ -1,0 +1,7 @@
+streamlit
+openai-whisper
+ollama
+pyyaml
+ffmpeg-python
+pillow
+moviepy
