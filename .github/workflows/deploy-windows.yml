@@ -1,0 +1,46 @@
+name: Deploy to Windows Server 2025
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Windows Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.WIN_SERVER_HOST }}
+          username: ${{ secrets.WIN_SERVER_USER }}
+          password: ${{ secrets.WIN_SERVER_PASSWORD }}
+          port: 22
+          script_stop: true
+          script: |
+            # Navigate to app directory
+            cd C:\apps\AI-MusicVideo-Autopilot
+            
+            # Pull latest code
+            git pull origin main
+            
+            # Activate virtual environment
+            .\venv\Scripts\Activate.ps1
+            
+            # Install/update dependencies
+            pip install --upgrade -r requirements.txt
+            
+            # Stop existing Streamlit process (if running)
+            taskkill /IM streamlit.exe /F 2>$null || echo "No streamlit process running"
+            
+            # Start Streamlit app in background
+            Start-Process powershell -ArgumentList "-Command", "cd C:\apps\AI-MusicVideo-Autopilot; .\venv\Scripts\Activate.ps1; streamlit run app/main.py --server.port 8501" -WindowStyle Hidden
+            
+            echo "Deployment completed successfully!"
